@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         unset($_SESSION['captcha_error']);
         $_SESSION['captcha_passed'] = true;
-        header("Location: ../../auth/security/security.php");
+        header("Location: ../../../backend/auth/sign-up/complete_registration.php");
         exit();
     }
 

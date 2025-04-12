@@ -25,10 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($submittedOtp === $_SESSION['otp_code']) {
-
-        $_SESSION['user_email'] = $_SESSION['otp_email'];
-        unset($_SESSION['otp_email'], $_SESSION['otp_code'], $_SESSION['otp_expiry']);
-        header("Location: ../../dashboard.php");
+        // OTP is correct, set security recovery email and redirect to security verification
+        $_SESSION['security_recovery_email'] = $_SESSION['otp_email'];
+        
+        // Clear OTP data
+        unset($_SESSION['otp_code'], $_SESSION['otp_expiry']);
+        
+        // Redirect to security verification
+        header("Location: ../security/security.php");
         exit();
     } else {
         $_SESSION['login_error'] = "Invalid OTP. Please try again.";

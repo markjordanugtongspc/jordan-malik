@@ -34,6 +34,10 @@ $qr_url = "https://api.qrserver.com/v1/create-qr-code/?data=" . $qrContent . "&s
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="../css/qrcode.css">
+    <script>
+        // Set the theme from localStorage before the page renders
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+    </script>
 </head>
 <body>
     <nav class="navbar">

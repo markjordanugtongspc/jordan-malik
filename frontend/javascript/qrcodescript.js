@@ -1,4 +1,27 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Theme toggle functionality - copied from dashboard.js
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeIcon = themeToggle.querySelector("i");
+    const htmlElement = document.documentElement;
+
+    const storedTheme = localStorage.getItem("theme") || "dark";
+    htmlElement.setAttribute("data-theme", storedTheme);
+    updateThemeIcon(storedTheme);
+
+    themeToggle.addEventListener("click", function() {
+        const currentTheme = htmlElement.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+        htmlElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        updateThemeIcon(newTheme);
+
+        showToast(`Theme changed to ${newTheme} mode`, "info");
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
+    }
 
     const video = document.getElementById('qr-video');
     const canvas = document.getElementById('qr-canvas');

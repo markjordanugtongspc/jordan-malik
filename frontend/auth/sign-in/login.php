@@ -3,24 +3,7 @@ session_start();
 
 require_once __DIR__ . '/../../../backend/database/config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp'])) {
-
-    if (!isset($_SESSION['otp_email']) || !isset($_SESSION['otp_code']) || !isset($_SESSION['otp_expiry'])) {
-        $_SESSION['login_error'] = "OTP session expired. Please try again.";
-        header("Location: login.php");
-        exit();
-    }
-
-    if ($_POST['otp'] === $_SESSION['otp_code'] && time() <= $_SESSION['otp_expiry']) {
-
-        $_SESSION['show_password_reset'] = true;
-    } else {
-        $_SESSION['login_error'] = "Invalid OTP. Please try again.";
-    }
-    header("Location: login.php");
-    exit();
-}
-
+// Password reset handling - keep this
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
     if (!isset($_SESSION['otp_email'])) {
         $_SESSION['login_error'] = "Session expired. Please start over.";
@@ -83,7 +66,7 @@ $showPasswordReset = isset($_SESSION['show_password_reset']);
                 <input type="submit" value="Update Password">
             </form>
             <?php else: ?>
-            <form action="<?= $showOtpField ? 'login.php' : '../../../backend/auth/sign-in/process_login.php' ?>" method="POST" class="auth-form-content">
+            <form action="<?= $showOtpField ? 'verify_otp.php' : '../../../backend/auth/sign-in/process_login.php' ?>" method="POST" class="auth-form-content">
                 <input type="email" name="email" placeholder="Email" required 
                        value="<?= htmlspecialchars($_SESSION['otp_email'] ?? '') ?>" 
                        <?= $showOtpField ? 'readonly' : '' ?>>
@@ -99,7 +82,7 @@ $showPasswordReset = isset($_SESSION['show_password_reset']);
                 </div>
                 <?php endif; ?>
 
-                <input type="submit" value="<?= $showOtpField ? 'Verify OTP' : 'Login' ?>">
+                <input type="submit" value="<?= $showOtpField ? 'Verify OTP' : 'Login' ?>"><?= $showOtpField ? '<small style="display:block;margin-top:10px;text-align:center;">After verification, you\'ll need to enter your security code</small>' : '' ?>
             </form>
             <?php endif; ?>
 

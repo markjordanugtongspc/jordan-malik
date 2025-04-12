@@ -173,3 +173,13 @@ body {
     90% { opacity: 1; }
     100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
 }
+
+.auth-instruction {
+    color: var(--auth-text-secondary);
+    font-size: 14px;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 8px;
+}
