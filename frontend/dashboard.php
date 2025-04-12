@@ -311,9 +311,12 @@ if ($result && $row = $result->fetch_assoc()) {
                         <label class="btn-upload" for="imageUpload">
                             <i class="fas fa-camera"></i> Change Photo </label>
                         <input type="file" id="imageUpload" accept="image/*">
+                        <small style="display: block; margin-top: 5px; text-align: center; color: var(--dashboard-text-secondary);">
+                            Profile image is stored locally and will not be visible on other devices
+                        </small>
                     </div>
                     <div class="form-group">
-                        <label for="username">Username</label>
+                        <label for="username">Full Name</label>
                         <input type="text" id="username" name="username" value="<?php echo $fullname; ?>">
                     </div>
                     <div class="form-group">

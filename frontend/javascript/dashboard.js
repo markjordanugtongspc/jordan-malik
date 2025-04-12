@@ -142,7 +142,6 @@ document.addEventListener("DOMContentLoaded", function() {
             e.preventDefault();
 
             try {
-
                 if (!usernameInput.value.trim()) {
                     showToast("Username cannot be empty", "error");
                     return;
@@ -154,21 +153,53 @@ document.addEventListener("DOMContentLoaded", function() {
                     return;
                 }
 
-                const formData = {
-                    username: usernameInput.value.trim(),
-                    email: emailInput.value.trim()
-                };
+                // Create form data for the API request
+                const formData = new FormData();
+                formData.append('fullname', usernameInput.value.trim());
+                formData.append('email', emailInput.value.trim());
 
-                localStorage.setItem("profileData", JSON.stringify(formData));
+                // Show loading toast
+                showToast("Updating profile...", "info");
 
-                if (displayUsername) {
-                    displayUsername.textContent = formData.username;
-                }
+                // Make API request to update profile
+                fetch('../backend/auth/profile/update_profile.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI with the new data
+                        if (displayUsername) {
+                            displayUsername.textContent = data.user.fullname;
+                        }
 
-                showToast("Profile updated successfully", "success");
-                modal.style.display = "none";
+                        // Also save to localStorage for other purposes
+                        const profileData = {
+                            username: data.user.fullname,
+                            email: data.user.email
+                        };
+                        localStorage.setItem("profileData", JSON.stringify(profileData));
+
+                        showToast("Profile updated successfully", "success");
+                        modal.style.display = "none";
+
+                        // Reload the page if email was changed
+                        if (emailInput.value.trim() !== emailInput.defaultValue) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        }
+                    } else {
+                        showToast(data.message || "Failed to update profile", "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error updating profile:", error);
+                    showToast("Failed to update profile. Please try again.", "error");
+                });
             } catch (error) {
-                console.error("Error saving profile:", error);
+                console.error("Error preparing profile update:", error);
                 showToast("Failed to save profile data", "error");
             }
         });
@@ -176,12 +207,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function loadProfileData() {
         try {
-
             const profileImg = document.getElementById("profileImg");
             const usernameInput = document.getElementById("username");
             const emailInput = document.getElementById("email");
             const displayUsername = document.getElementById("display-username");
 
+            // Load profile image from localStorage
             if (profileImg) {
                 const savedImage = localStorage.getItem("profileImage");
                 if (savedImage) {
@@ -198,19 +229,24 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
 
+            // First try to use the server-side data (which is already loaded in the HTML)
+            // This is for fullname and email which are already rendered by PHP
+            
+            // Then load any saved data from localStorage for additional profile data
             const savedProfileData = localStorage.getItem("profileData");
             if (savedProfileData) {
                 const profileData = JSON.parse(savedProfileData);
-
-                if (usernameInput && profileData.username) {
+                
+                // Don't override the server data for these fields unless they're empty
+                if (usernameInput && !usernameInput.value && profileData.username) {
                     usernameInput.value = profileData.username;
                 }
 
-                if (emailInput && profileData.email) {
+                if (emailInput && !emailInput.value && profileData.email) {
                     emailInput.value = profileData.email;
                 }
 
-                if (displayUsername && profileData.username) {
+                if (displayUsername && !displayUsername.textContent.trim() && profileData.username) {
                     displayUsername.textContent = profileData.username;
                 }
             }

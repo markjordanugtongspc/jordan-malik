@@ -277,4 +277,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     resetUserInfo();
+
+    // Load profile image from localStorage for consistent UI across pages
+    function loadProfileImage() {
+        const profileImageElements = document.querySelectorAll('.profile-image img');
+        if (profileImageElements.length > 0) {
+            const savedImage = localStorage.getItem("profileImage");
+            if (savedImage) {
+                profileImageElements.forEach(img => {
+                    img.src = savedImage;
+                });
+            }
+        }
+    }
+    
+    // Call the function to load profile images
+    loadProfileImage();
 });
