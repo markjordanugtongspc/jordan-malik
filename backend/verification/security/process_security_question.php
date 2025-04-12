@@ -29,6 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullname = $data['fullname'];
     $email = $data['email'];
     $hashedPassword = $data['hashed_password'];
+    $securityCode = $data['security_code'] ?? '';
 
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
@@ -41,11 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $insertStmt = $conn->prepare("INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)");
-    $insertStmt->bind_param("sss", $fullname, $email, $hashedPassword);
+    $insertStmt = $conn->prepare("INSERT INTO users (fullname, email, password, security_code) VALUES (?, ?, ?, ?)");
+    $insertStmt->bind_param("ssss", $fullname, $email, $hashedPassword, $securityCode);
 
     if ($insertStmt->execute()) {
-
         unset($_SESSION['temp_registration_data'], $_SESSION['captcha_passed'], $_SESSION['temp_user_email']);
         $_SESSION['authenticated'] = true;
         $_SESSION['user_email'] = $email;

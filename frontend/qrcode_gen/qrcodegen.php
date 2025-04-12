@@ -50,7 +50,7 @@ $qr_url = "https://api.qrserver.com/v1/create-qr-code/?data=" . $qrContent . "&s
             <div class="theme-toggle" id="theme-toggle">
                 <i class="fas fa-moon"></i>
             </div>
-            <a href="../backend/auth/sign-out/logout.php" class="logout">
+            <a href="../../backend/auth/sign-out/logout.php" class="logout">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>

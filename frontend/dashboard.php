@@ -1,12 +1,26 @@
 <?php
 session_start();
+include '../backend/database/config.php';
+
 if (!isset($_SESSION['user_email'])) {
     header("Location: ./auth/sign-in/login.php?error=You must be logged in to access this page.");
     exit();
 }
 
-$username = explode('@', $_SESSION['user_email'])[0];
-$username = ucfirst($username);
+// Fetch user's full name from database
+$user_email = $_SESSION['user_email'];
+$stmt = $conn->prepare("SELECT fullname FROM users WHERE email = ?");
+$stmt->bind_param("s", $user_email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $row = $result->fetch_assoc()) {
+    $fullname = $row['fullname'];
+} else {
+    // Fallback to email username if database fetch fails
+    $fullname = explode('@', $_SESSION['user_email'])[0];
+    $fullname = ucfirst($fullname);
+}
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +28,7 @@ $username = ucfirst($username);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | <?php echo $username; ?> </title>
+    <title>Dashboard | <?php echo $fullname; ?> </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../backend/facialrecog/face-api.js"></script>
@@ -77,7 +91,7 @@ $username = ucfirst($username);
     </div>
     <div class="main-content">
         <section class="welcome-section">
-            <h1>Welcome back, <span id="display-username"> <?php echo $username; ?> </span>! </h1>
+            <h1>Welcome back, <span id="display-username"> <?php echo $fullname; ?> </span>! </h1>
             <p>You're now securely logged in to your dashboard.</p>
             <p>Last login: <?php echo date('F j, Y \a\t g:i a'); ?> </p>
             <div class="live-clock">
@@ -120,7 +134,7 @@ $username = ucfirst($username);
                     // Get user data for QR code
                     $qrData = array(
                         'id' => 'USER-' . rand(1000, 9999), // Replace with actual user ID
-                        'name' => $username,
+                        'name' => $fullname,
                         'email' => $_SESSION['user_email']
                     );
                     $qrContent = urlencode(json_encode($qrData));
@@ -300,13 +314,11 @@ $username = ucfirst($username);
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" name="username" value="
-														<?php echo $username; ?>">
+                        <input type="text" id="username" name="username" value="<?php echo $fullname; ?>">
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="
-															<?php echo $_SESSION['user_email']; ?>">
+                        <input type="email" id="email" name="email" value="<?php echo $_SESSION['user_email']; ?>">
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
                 </form>

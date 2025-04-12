@@ -28,10 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['captcha_error'] = "Please confirm you're not a robot.";
     } elseif (strtoupper($userInput) !== strtoupper($storedCaptcha)) {
         $_SESSION['captcha_error'] = "CAPTCHA does not match.";
-
         $_SESSION['captcha_answer'] = generateCaptcha();
     } else {
-
         unset($_SESSION['captcha_error']);
         $_SESSION['captcha_passed'] = true;
         header("Location: ../../auth/security/security.php");
@@ -96,6 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 10px;
             margin: 20px 0;
             box-shadow: 0 0 10px var(--dashboard-primary);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
         }
         input[type="text"], input[type="submit"] {
             width: 100%;
@@ -139,20 +142,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-
-        <?php if (isset($_SESSION['captcha_error'])): ?>
         document.addEventListener('DOMContentLoaded', function() {
+            <?php if (isset($_SESSION['captcha_error'])): ?>
             Swal.fire({
                 icon: 'error',
                 title: 'Verification Failed',
                 text: '<?= addslashes($_SESSION['captcha_error']) ?>',
-                background: var(--dashboard-background),
-                color: var(--dashboard-text),
-                confirmButtonColor: var(--dashboard-primary)
+                background: 'var(--dashboard-background)',
+                color: 'var(--dashboard-text)',
+                confirmButtonColor: 'var(--dashboard-primary)',
+                customClass: {
+                    popup: 'captcha-swal-popup',
+                    container: 'captcha-swal-container'
+                },
+                position: 'center',
+                backdrop: `
+                    rgba(0,0,0,0.7)
+                    center
+                    no-repeat
+                `,
+                timer: 4000,
+                timerProgressBar: true,
+                showConfirmButton: true,
+                willClose: () => {
+                    console.log('SweetAlert closed automatically after 4 seconds');
+                    window.location.reload();
+                }
             });
             <?php unset($_SESSION['captcha_error']); ?>
+            <?php endif; ?>
         });
-        <?php endif; ?>
 
         function validateCaptchaForm() {
             const captchaInput = document.forms["captchaForm"]["captcha_input"].value;
@@ -163,8 +182,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     icon: 'error',
                     title: 'Oops...',
                     text: "Please confirm you're not a robot.",
-                    background: var(--dashboard-background),
-                    color: var(--dashboard-text)
+                    background: 'var(--dashboard-background)',
+                    color: 'var(--dashboard-text)',
+                    confirmButtonColor: 'var(--dashboard-primary)',
+                    customClass: {
+                        popup: 'captcha-swal-popup',
+                        container: 'captcha-swal-container'
+                    },
+                    position: 'center',
+                    backdrop: `
+                        rgba(0,0,0,0.7)
+                        center
+                        no-repeat
+                    `,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    showConfirmButton: true,
+                    willClose: () => {
+                        window.location.reload();
+                    }
                 });
                 return false;
             }
@@ -174,8 +210,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     icon: 'error',
                     title: 'Oops...',
                     text: "Please enter the CAPTCHA code.",
-                    background: var(--dashboard-background),
-                    color: var(--dashboard-text)
+                    background: 'var(--dashboard-background)',
+                    color: 'var(--dashboard-text)',
+                    confirmButtonColor: 'var(--dashboard-primary)',
+                    customClass: {
+                        popup: 'captcha-swal-popup',
+                        container: 'captcha-swal-container'
+                    },
+                    position: 'center',
+                    backdrop: `
+                        rgba(0,0,0,0.7)
+                        center
+                        no-repeat
+                    `,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    showConfirmButton: true,
+                    willClose: () => {
+                        window.location.reload();
+                    }
                 });
                 return false;
             }
@@ -200,5 +253,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" value="Verify">
         </form>
     </div>
+    
+    <style>
+        /* Custom SweetAlert Styling */
+        .captcha-swal-container {
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .captcha-swal-popup {
+            border: 1px solid var(--dashboard-primary);
+            border-radius: 12px;
+            box-shadow: 0 0 20px var(--dashboard-primary);
+            animation: swalBounce 0.3s ease-out;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0 !important;
+            padding: 1.5rem;
+        }
+        
+        @keyframes swalBounce {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            70% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        /* Progress timer styling */
+        .swal2-timer-progress-bar {
+            background: var(--dashboard-primary) !important;
+        }
+    </style>
 </body>
 </html>
